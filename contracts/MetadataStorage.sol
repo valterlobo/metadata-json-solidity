@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-//import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
 contract MetadataStorage {
@@ -81,7 +80,7 @@ contract MetadataStorage {
                 arrAttributes[index].displayType,
                 '",'
             );
-            metadata = abi.encodePacked(metadata, metadataParcial);
+                 metadata = abi.encodePacked(metadata, metadataParcial);
 
             }
 
