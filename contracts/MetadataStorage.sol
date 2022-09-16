@@ -55,9 +55,7 @@ contract MetadataStorage {
         
         bytes memory metadataParcial;
         bytes memory metadata = "{";
-        //metadata = abi.encodePacked(metadata, "{");
         for (uint256 index = 0; index < arrProperties.length; index++) {
-
 
             metadataParcial = abi.encodePacked(
                 '"' , 
@@ -67,8 +65,6 @@ contract MetadataStorage {
                 '",'
             );
             metadata = abi.encodePacked(metadata, metadataParcial);
-
-        
         }
         
         metadata = abi.encodePacked(metadata, '"attributes": [');
@@ -83,8 +79,6 @@ contract MetadataStorage {
                  metadata = abi.encodePacked(metadata, metadataParcial);
 
             }
-
-     
 
             metadataParcial = abi.encodePacked(
                 '"trait_type":"',
@@ -105,7 +99,7 @@ contract MetadataStorage {
             }
            
         }
-
+        
         metadata = abi.encodePacked(metadata, "] }");
         string memory attributes64 = Base64.encode(metadata);
         return abi.encodePacked("data:application/json;base64,", attributes64);
