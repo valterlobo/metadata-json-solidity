@@ -29,13 +29,13 @@ describe("Metadata", function () {
             it("ADD attributes", async function () {
                 const { metadataStorage } = await loadFixture(deployContract)
 
-                await metadataStorage.addProperty(1,  "name", "CERTIFICADO")
-                await metadataStorage.addProperty(1,  "image", "http://ipfs/QQQQQQQQ")
-                await metadataStorage.addProperty(1,  "description", "Certificado de curso")
+                await metadataStorage.addProperty(1, "name", "CERTIFICADO")
+                await metadataStorage.addProperty(1, "image", "http://ipfs/QQQQQQQQ")
+                await metadataStorage.addProperty(1, "description", "Certificado de curso")
 
                 await metadataStorage.addAttribute(1, "dados", "name", "JOAO")
                 await metadataStorage.addAttribute(1, "dados", "doc", "543543543543543")
-                await metadataStorage.addAttribute(1, "",      "instituicao", "OMEGA CURSOS")
+                await metadataStorage.addAttribute(1, "", "instituicao", "OMEGA CURSOS")
                 await metadataStorage.addAttribute(1, "", "curso", "DEV GAMBIARRA")
                 await metadataStorage.addAttribute(1, "", "turma", "2022/01")
                 await metadataStorage.addAttribute(1, "", "matricula", "12022/1")
@@ -44,17 +44,17 @@ describe("Metadata", function () {
                 await metadataStorage.addAttribute(1, "", "instrutor", "Master Paulo")
 
 
-                await metadataStorage.addProperty(2,  "name", "CERTIFICADO")
-                await metadataStorage.addProperty(2,  "image", "http://ipfs/QQQQQQQQ/2.png")
-                await metadataStorage.addProperty(2,  "external_url", "http://ipfs/QQQQQQQQ/2.html")
-                
-                await metadataStorage.addProperty(2,  "description", 'A weapon found within Neon District.' + 
-                "A Neon District: Season One game item, playable on https://portal.neondistrict.io." +             
-                "Neon District is a free-to-play cyberpunk role-playing game. Collect characters and gear, craft and level up teams, and battle against other players through competitive multiplayer and in turn-based combat.")
+                await metadataStorage.addProperty(2, "name", "CERTIFICADO")
+                await metadataStorage.addProperty(2, "image", "http://ipfs/QQQQQQQQ/2.png")
+                await metadataStorage.addProperty(2, "external_url", "http://ipfs/QQQQQQQQ/2.html")
+
+                await metadataStorage.addProperty(2, "description", 'A weapon found within Neon District.' +
+                    "A Neon District: Season One game item, playable on https://portal.neondistrict.io." +
+                    "Neon District is a free-to-play cyberpunk role-playing game. Collect characters and gear, craft and level up teams, and battle against other players through competitive multiplayer and in turn-based combat.")
 
                 await metadataStorage.addAttribute(2, "dados", "name", "MARIA")
                 await metadataStorage.addAttribute(2, "dados", "doc", "4344324343434")
-                await metadataStorage.addAttribute(2, "",      "instituicao", "OMEGA CURSOS")
+                await metadataStorage.addAttribute(2, "", "instituicao", "OMEGA CURSOS")
                 await metadataStorage.addAttribute(2, "", "curso", "DEV GAMBIARRA")
                 await metadataStorage.addAttribute(2, "", "turma", "2022/01")
                 await metadataStorage.addAttribute(2, "", "matricula", "22022/1")
@@ -64,21 +64,38 @@ describe("Metadata", function () {
 
                 let attribute = await metadataStorage.getMetadataJSON(2)
 
-   
+
 
                 console.log(attribute)
                 console.log("----------");
                 console.log(attribute);
-                const jsonFromString =  hre.ethers.utils.toUtf8String(attribute)
+                const jsonFromString = hre.ethers.utils.toUtf8String(attribute)
                 console.log('String to JSON: ', jsonFromString);
                 console.log("----------");
 
                 await metadataStorage.updateAttribute(2, "dados", "name", "master")
 
-                await metadataStorage.updateProperty(2,  "name", "CERTIFICADO CURSO ABC")
+                await metadataStorage.updateProperty(2, "name", "CERTIFICADO CURSO ABC")
 
                 attribute = await metadataStorage.getMetadataJSON(2)
                 console.log('String to JSON 2 : ', hre.ethers.utils.toUtf8String(attribute));
+
+
+
+            });
+
+
+        });
+
+        describe("NultCall", function () {
+
+            it("MultCall", async function () {
+                const { metadataStorage } = await loadFixture(deployContract)
+
+                await metadataStorage.addProperty(1, "name", "CERTIFICADO")
+                await metadataStorage.addProperty(1, "image", "http://ipfs/QQQQQQQQ")
+                await metadataStorage.addProperty(1, "description", "Certificado de curso")
+
 
 
 

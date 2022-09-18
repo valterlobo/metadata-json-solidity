@@ -13,6 +13,9 @@ contract MetadataStorage {
         string displayType;
         string keyType;
         string valueType;
+        string tagKey;
+        string tagValue;
+        string tagType;
     }
 
     struct Property {
@@ -49,10 +52,20 @@ contract MetadataStorage {
         uint256 id,
         string memory displayType,
         string memory keyType,
-        string memory valueType
+        string memory valueType,
+        string memory tagKey,
+        string memory tagValue,
+        string memory tagType
     ) external {
         metadatas[id].attributes.push(
-            Attribute(displayType, keyType, valueType)
+            Attribute(
+                displayType,
+                keyType,
+                valueType,
+                tagKey,
+                tagValue,
+                tagType
+            )
         );
         uint256 idx = metadatas[id].attributes.length - 1;
         indexAttributes[id][keyType] = idx;
@@ -92,7 +105,10 @@ contract MetadataStorage {
             metadata = abi.encodePacked(metadata, "{");
             if (!isEmpty(arrAttributes[index].displayType)) {
                 metadataParcial = abi.encodePacked(
-                    '"display_type":"',
+                    '"',
+                    arrAttributes[index].tagType,
+                    '":',
+                    '"',
                     arrAttributes[index].displayType,
                     '",'
                 );
@@ -100,14 +116,20 @@ contract MetadataStorage {
             }
 
             metadataParcial = abi.encodePacked(
-                '"trait_type":"',
+                '"',
+                arrAttributes[index].tagKey,
+                '":',
+                '"',
                 arrAttributes[index].keyType,
                 '",'
             );
             metadata = abi.encodePacked(metadata, metadataParcial);
 
             metadataParcial = abi.encodePacked(
-                '"value":"',
+                '"',
+                arrAttributes[index].tagValue,
+                '":',
+                '"',
                 arrAttributes[index].valueType,
                 '"'
             );
