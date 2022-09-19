@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/Base64.sol";
+import "hardhat/console.sol";
 
 contract MetadataStorage {
     mapping(uint256 => Metadata) metadatas;
@@ -44,8 +45,16 @@ contract MetadataStorage {
         string memory value
     ) external {
         uint256 idx = indexProperties[id][key];
-        metadatas[id].properties[idx].key = key;
         metadatas[id].properties[idx].value = value;
+    }
+
+    function deleteProperty(uint256 id, string memory key) external {
+        uint256 idx = indexProperties[id][key];
+        require(
+            isEqual(metadatas[id].properties[idx].key, key),
+            "NOT EXIST KEY"
+        );
+        delete metadatas[id].properties[idx];
     }
 
     function addAttribute(
@@ -83,6 +92,15 @@ contract MetadataStorage {
         metadatas[id].attributes[idx].valueType = valueType;
     }
 
+    function deleteAttribute(uint256 id, string memory keyType) external {
+        uint256 idx = indexAttributes[id][keyType];
+        require(
+            isEqual(metadatas[id].attributes[idx].keyType, keyType),
+            "NOT EXIST KEY TYPE"
+        );
+        delete metadatas[id].attributes[idx];
+    }
+
     function getMetadataJSON(uint256 id) external view returns (bytes memory) {
         Attribute[] memory arrAttributes = metadatas[id].attributes;
         Property[] memory arrProperties = metadatas[id].properties;
@@ -90,52 +108,60 @@ contract MetadataStorage {
         bytes memory metadataParcial;
         bytes memory metadata = "{";
         for (uint256 index = 0; index < arrProperties.length; index++) {
-            metadataParcial = abi.encodePacked(
-                '"',
-                arrProperties[index].key,
-                '": "',
-                arrProperties[index].value,
-                '",'
-            );
-            metadata = abi.encodePacked(metadata, metadataParcial);
-        }
-
-        metadata = abi.encodePacked(metadata, '"attributes": [');
-        for (uint256 index = 0; index < arrAttributes.length; index++) {
-            metadata = abi.encodePacked(metadata, "{");
-            if (!isEmpty(arrAttributes[index].displayType)) {
+            if (!isEmpty(arrProperties[index].key)) {
                 metadataParcial = abi.encodePacked(
                     '"',
-                    arrAttributes[index].tagType,
-                    '":',
-                    '"',
-                    arrAttributes[index].displayType,
+                    arrProperties[index].key,
+                    '": "',
+                    arrProperties[index].value,
                     '",'
                 );
                 metadata = abi.encodePacked(metadata, metadataParcial);
             }
+        }
 
-            metadataParcial = abi.encodePacked(
-                '"',
-                arrAttributes[index].tagKey,
-                '":',
-                '"',
-                arrAttributes[index].keyType,
-                '",'
-            );
-            metadata = abi.encodePacked(metadata, metadataParcial);
+        metadata = abi.encodePacked(metadata, '"attributes": [');
+        uint256 flagLast = arrAttributes.length - 1;
+        for (uint256 index = 0; index < arrAttributes.length; index++) {
+            if (!isEmpty(arrAttributes[index].keyType)) {
+                metadata = abi.encodePacked(metadata, "{");
+                if (!isEmpty(arrAttributes[index].displayType)) {
+                    metadataParcial = abi.encodePacked(
+                        '"',
+                        arrAttributes[index].tagType,
+                        '":',
+                        '"',
+                        arrAttributes[index].displayType,
+                        '",'
+                    );
+                    metadata = abi.encodePacked(metadata, metadataParcial);
+                }
 
-            metadataParcial = abi.encodePacked(
-                '"',
-                arrAttributes[index].tagValue,
-                '":',
-                '"',
-                arrAttributes[index].valueType,
-                '"'
-            );
-            metadata = abi.encodePacked(metadata, metadataParcial);
-            metadata = abi.encodePacked(metadata, "}");
-            if (index < (arrAttributes.length - 1)) {
+                metadataParcial = abi.encodePacked(
+                    '"',
+                    arrAttributes[index].tagKey,
+                    '":',
+                    '"',
+                    arrAttributes[index].keyType,
+                    '",'
+                );
+                metadata = abi.encodePacked(metadata, metadataParcial);
+
+                metadataParcial = abi.encodePacked(
+                    '"',
+                    arrAttributes[index].tagValue,
+                    '":',
+                    '"',
+                    arrAttributes[index].valueType,
+                    '"'
+                );
+                metadata = abi.encodePacked(metadata, metadataParcial);
+                metadata = abi.encodePacked(metadata, "}");
+            } else {
+                flagLast = flagLast - 1;
+            }
+            console.log(index, flagLast);
+            if (index < flagLast && !isEmpty(arrAttributes[index].keyType)) {
                 metadata = abi.encodePacked(metadata, ",");
             }
         }
@@ -147,5 +173,14 @@ contract MetadataStorage {
 
     function isEmpty(string memory _s) internal pure returns (bool) {
         return bytes(_s).length == 0;
+    }
+
+    function isEqual(string memory a, string memory b)
+        internal
+        pure
+        returns (bool)
+    {
+        return (keccak256(abi.encodePacked(a)) ==
+            keccak256(abi.encodePacked(b)));
     }
 }
