@@ -2,7 +2,6 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/Base64.sol";
-import "hardhat/console.sol";
 
 contract MetadataStorage {
     mapping(uint256 => Metadata) metadatas;
@@ -104,6 +103,9 @@ contract MetadataStorage {
     function getMetadataJSON(uint256 id) external view returns (bytes memory) {
         Attribute[] memory arrAttributes = metadatas[id].attributes;
         Property[] memory arrProperties = metadatas[id].properties;
+        Attribute[] memory arrAttributesTemp = new Attribute[](
+            arrAttributes.length
+        );
 
         bytes memory metadataParcial;
         bytes memory metadata = "{";
@@ -121,51 +123,54 @@ contract MetadataStorage {
         }
 
         metadata = abi.encodePacked(metadata, '"attributes": [');
-        uint256 flagLast = arrAttributes.length - 1;
+
+        uint256 idx = 0;
         for (uint256 index = 0; index < arrAttributes.length; index++) {
             if (!isEmpty(arrAttributes[index].keyType)) {
-                metadata = abi.encodePacked(metadata, "{");
-                if (!isEmpty(arrAttributes[index].displayType)) {
-                    metadataParcial = abi.encodePacked(
-                        '"',
-                        arrAttributes[index].tagType,
-                        '":',
-                        '"',
-                        arrAttributes[index].displayType,
-                        '",'
-                    );
-                    metadata = abi.encodePacked(metadata, metadataParcial);
-                }
-
-                metadataParcial = abi.encodePacked(
-                    '"',
-                    arrAttributes[index].tagKey,
-                    '":',
-                    '"',
-                    arrAttributes[index].keyType,
-                    '",'
-                );
-                metadata = abi.encodePacked(metadata, metadataParcial);
-
-                metadataParcial = abi.encodePacked(
-                    '"',
-                    arrAttributes[index].tagValue,
-                    '":',
-                    '"',
-                    arrAttributes[index].valueType,
-                    '"'
-                );
-                metadata = abi.encodePacked(metadata, metadataParcial);
-                metadata = abi.encodePacked(metadata, "}");
-            } else {
-                flagLast = flagLast - 1;
-            }
-            console.log(index, flagLast);
-            if (index < flagLast && !isEmpty(arrAttributes[index].keyType)) {
-                metadata = abi.encodePacked(metadata, ",");
+                arrAttributesTemp[idx] = arrAttributes[index];
+                idx = idx + 1;
             }
         }
 
+        for (uint256 index = 0; index < idx; index++) {
+            metadata = abi.encodePacked(metadata, "{");
+            if (!isEmpty(arrAttributesTemp[index].displayType)) {
+                metadataParcial = abi.encodePacked(
+                    '"',
+                    arrAttributesTemp[index].tagType,
+                    '":',
+                    '"',
+                    arrAttributesTemp[index].displayType,
+                    '",'
+                );
+                metadata = abi.encodePacked(metadata, metadataParcial);
+            }
+
+            metadataParcial = abi.encodePacked(
+                '"',
+                arrAttributesTemp[index].tagKey,
+                '":',
+                '"',
+                arrAttributesTemp[index].keyType,
+                '",'
+            );
+            metadata = abi.encodePacked(metadata, metadataParcial);
+
+            metadataParcial = abi.encodePacked(
+                '"',
+                arrAttributesTemp[index].tagValue,
+                '":',
+                '"',
+                arrAttributesTemp[index].valueType,
+                '"'
+            );
+            metadata = abi.encodePacked(metadata, metadataParcial);
+            metadata = abi.encodePacked(metadata, "}");
+
+            if (index < idx - 1) {
+                metadata = abi.encodePacked(metadata, ",");
+            }
+        }
         metadata = abi.encodePacked(metadata, "] }");
         string memory attributes64 = Base64.encode(metadata);
         return abi.encodePacked("data:application/json;base64,", attributes64);
