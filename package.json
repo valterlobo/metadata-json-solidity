@@ -11,12 +11,14 @@
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "hardhat": "^2.11.2",
     "hardhat-gas-reporter": "^1.0.9"
   },
   "dependencies": {
     "@makerdao/multicall": "^0.12.0",
     "@openzeppelin/contracts": "^4.7.3",
+    "dotenv": "^16.0.3",
     "ethers-multicall": "^0.2.3"
   }
 }

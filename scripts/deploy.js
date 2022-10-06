@@ -1,12 +1,20 @@
+const main = async () => {
+  const MetadataStorage = await hre.ethers.getContractFactory('MetadataStorage')
+  const metadataStorage = await MetadataStorage.deploy()
+  await metadataStorage.deployed()
 
-const hre = require("hardhat");
-
-async function main() {
-             
+  console.log("MetadataStorage deployed to:", metadataStorage.address)
 
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+const runMain = async () => {
+  try {
+    await main();
+    process.exit(0);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+
+runMain();

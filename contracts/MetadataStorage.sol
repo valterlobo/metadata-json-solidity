@@ -2,8 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/Base64.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
-contract MetadataStorage {
+contract MetadataStorage is Multicall, Ownable {
     mapping(uint256 => Metadata) metadatas;
 
     mapping(uint256 => mapping(string => uint256)) indexProperties;
@@ -32,7 +34,7 @@ contract MetadataStorage {
         uint256 id,
         string memory key,
         string memory value
-    ) external {
+    ) external onlyOwner {
         metadatas[id].properties.push(Property(key, value));
         uint256 idx = metadatas[id].properties.length - 1;
         indexProperties[id][key] = idx;
@@ -42,12 +44,12 @@ contract MetadataStorage {
         uint256 id,
         string memory key,
         string memory value
-    ) external {
+    ) external onlyOwner {
         uint256 idx = indexProperties[id][key];
         metadatas[id].properties[idx].value = value;
     }
 
-    function deleteProperty(uint256 id, string memory key) external {
+    function deleteProperty(uint256 id, string memory key) external onlyOwner {
         uint256 idx = indexProperties[id][key];
         require(
             isEqual(metadatas[id].properties[idx].key, key),
@@ -64,7 +66,7 @@ contract MetadataStorage {
         string memory tagKey,
         string memory tagValue,
         string memory tagType
-    ) external {
+    ) external onlyOwner {
         metadatas[id].attributes.push(
             Attribute(
                 displayType,
@@ -84,7 +86,7 @@ contract MetadataStorage {
         string memory displayType,
         string memory keyType,
         string memory valueType
-    ) external {
+    ) external onlyOwner {
         uint256 idx = indexAttributes[id][keyType];
         metadatas[id].attributes[idx].displayType = displayType;
         metadatas[id].attributes[idx].keyType = keyType;
@@ -100,7 +102,7 @@ contract MetadataStorage {
         delete metadatas[id].attributes[idx];
     }
 
-    function getMetadataJSON(uint256 id) external view returns (bytes memory) {
+    function getMetadataJSON(uint256 id) external view returns (string memory) {
         Attribute[] memory arrAttributes = metadatas[id].attributes;
         Property[] memory arrProperties = metadatas[id].properties;
         Attribute[] memory arrAttributesTemp = new Attribute[](
@@ -173,7 +175,10 @@ contract MetadataStorage {
         }
         metadata = abi.encodePacked(metadata, "] }");
         string memory attributes64 = Base64.encode(metadata);
-        return abi.encodePacked("data:application/json;base64,", attributes64);
+        return
+            string(
+                abi.encodePacked("data:application/json;base64,", attributes64)
+            );
     }
 
     function isEmpty(string memory _s) internal pure returns (bool) {
