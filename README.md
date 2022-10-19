@@ -14,3 +14,20 @@ REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.js
 ```
+
+# Verify 
+npx hardhat verify CONTRACT_ADDR --network mumbai
+
+
+## MultCall 
+ 
+ npm i @makerdao/multicall
+
+
+https://betterprogramming.pub/speed-up-your-defi-queries-using-multicall-d4cf652d8ab6
+
+
+## openzeppelin
+
+
+https://docs.openzeppelin.com/contracts/4.x/api/utils#Multicall

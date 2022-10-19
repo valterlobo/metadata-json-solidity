@@ -40,6 +40,18 @@ contract MetadataStorage is Multicall, Ownable {
         indexProperties[id][key] = idx;
     }
 
+    function addProperties(uint256 id, Property[] memory properties)
+        external
+        onlyOwner
+    {
+        for (uint256 index = 0; index < properties.length; index++) {
+            Property memory prop = properties[index];
+            metadatas[id].properties.push(prop);
+            uint256 idx = metadatas[id].properties.length - 1;
+            indexProperties[id][prop.key] = idx;
+        }
+    }
+
     function updateProperty(
         uint256 id,
         string memory key,
@@ -79,6 +91,18 @@ contract MetadataStorage is Multicall, Ownable {
         );
         uint256 idx = metadatas[id].attributes.length - 1;
         indexAttributes[id][keyType] = idx;
+    }
+
+    function addAttributes(uint256 id, Attribute[] memory attributes)
+        external
+        onlyOwner
+    {
+        for (uint256 index = 0; index < attributes.length; index++) {
+            Attribute memory attr = attributes[index];
+            metadatas[id].attributes.push(attr);
+            uint256 idx = metadatas[id].attributes.length - 1;
+            indexAttributes[id][attr.keyType] = idx;
+        }
     }
 
     function updateAttribute(
